@@ -1,0 +1,6 @@
+# Build outputs and local tooling
+.artifacts/
+dist/
+*.jks
+*.keystore
+keystore.properties

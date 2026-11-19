@@ -1,0 +1,7 @@
+bin/
+obj/
+*.user
+.vs/
+TestResults/
+# Downloaded by scripts/get-presentmon.ps1
+PcStats.Agent/tools/PresentMon*.exe
