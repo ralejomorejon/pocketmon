@@ -4,8 +4,11 @@ import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -81,19 +84,31 @@ fun FpsCounter(value: Double?, size: TextUnit, modifier: Modifier = Modifier) {
     }
 }
 
-/** Game logo (or its name) above a large FPS counter. */
+/** Game logo (or its name) with a large FPS counter: stacked when there's height, side by side when short. */
 @Composable
 fun NowPlaying(fps: FpsStats, httpBase: String?, modifier: Modifier = Modifier) {
     val logo = rememberRemoteImage(logoUrl(httpBase, fps.logo))
     val title = fps.game ?: fps.app?.removeSuffix(".exe") ?: ""
-    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-        Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
+    val art: @Composable (Modifier) -> Unit = { m ->
+        Box(m, contentAlignment = Alignment.Center) {
             if (logo != null) {
                 Image(logo, contentDescription = title, contentScale = ContentScale.Fit)
             } else {
                 FitText(title, 18.sp, color = Palette.Value, weight = FontWeight.Bold)
             }
         }
-        FpsCounter(fps.value, 44.sp)
+    }
+    BoxWithConstraints(modifier) {
+        if (maxHeight < 150.dp && maxWidth > maxHeight * 1.3f) {
+            Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                art(Modifier.weight(1f).fillMaxHeight())
+                FpsCounter(fps.value, 34.sp)
+            }
+        } else {
+            Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                art(Modifier.fillMaxWidth().weight(1f))
+                FpsCounter(fps.value, 44.sp)
+            }
+        }
     }
 }

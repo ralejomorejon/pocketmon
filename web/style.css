@@ -189,3 +189,6 @@ input:focus, select:focus { outline: none; border-color: var(--accent); }
 .page button.danger { color: var(--hot); border-color: #c0766e99; }
 .titlebar { display: flex; align-items: center; justify-content: space-between; }
 .page button.link { width: auto; border: none; color: var(--accent); padding: 8px; }
+.np.row { flex-direction: row; gap: 8px; }
+.np.row .np-logo { flex: 1 1 0; min-width: 0; max-height: 100%; height: 100%; }
+.np.row .np-num { font-size: 34px; }

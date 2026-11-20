@@ -133,16 +133,16 @@ function memoryPanel(m) {
     </div></div>`;
 }
 
-/** Game logo (or name) with the FPS counter in the display font. */
-function nowPlaying(fps) {
+/** Game logo (or name) with the FPS counter in the display font; side by side in the short portrait panel. */
+function nowPlaying(fps, row = false) {
   const title = fps.game ?? fps.app?.replace(/\.exe$/i, '') ?? '';
   const logo = fps.logo
     ? `<img class="np-logo" src="${e(fps.logo)}" alt="${e(title)}">`
     : `<div class="np-name">${fit(e(title), 20)}</div>`;
-  return `<div class="np">${logo}<div class="np-fps"><span class="np-num">${e(F.fps(fps.value))}</span><span class="np-unit">FPS</span></div></div>`;
+  return `<div class="np${row ? ' row' : ''}">${logo}<div class="np-fps"><span class="np-num">${e(F.fps(fps.value))}</span><span class="np-unit">FPS</span></div></div>`;
 }
 
-function storagePanel(m) {
+function storagePanel(m, landscape = true) {
   const disks = m.s?.disks ?? [];
   const fps = m.s?.fps;
   const rows = disks.slice(0, fps ? 2 : 4).map((d) => {
@@ -154,7 +154,7 @@ function storagePanel(m) {
         <div class="row">${fit(`${e(F.size(d.freeMb))} free of ${e(F.size(d.totalMb))}`, 9.5, 'muted grow')}${isNum(d.temp) ? `<span class="muted t">${e(m.t(d.temp))}°</span>` : ''}</div></div>
     </div>`;
   });
-  return `<div class="panel">${header('Storage')}<div class="disks">${rows.join('') || `<div class="muted">${F.DASH}</div>`}</div>${fps ? nowPlaying(fps) : ''}</div>`;
+  return `<div class="panel">${header('Storage')}<div class="disks">${rows.join('') || `<div class="muted">${F.DASH}</div>`}</div>${fps ? nowPlaying(fps, !landscape) : ''}</div>`;
 }
 
 export function modern(m, landscape) {
@@ -170,7 +170,7 @@ export function modern(m, landscape) {
     <div class="row" style="flex:.85"><div class="cell" style="flex:1">${clockPanel(m)}</div><div class="cell bl" style="flex:1">${memoryPanel(m)}</div></div>
     <div class="cell bt" style="flex:1.3">${cpuPanel(m, true)}</div>
     <div class="cell bt" style="flex:1.3">${gpuPanel(m, true)}</div>
-    <div class="row bt" style="flex:1"><div class="cell" style="flex:1">${networkPanel(m)}</div><div class="cell bl" style="flex:1">${storagePanel(m)}</div></div>
+    <div class="row bt" style="flex:1"><div class="cell" style="flex:1">${networkPanel(m)}</div><div class="cell bl" style="flex:1">${storagePanel(m, false)}</div></div>
   </div>`;
 }
 

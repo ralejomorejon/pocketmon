@@ -72,7 +72,8 @@ starts elevated without a UAC prompt), **Open config folder**, **Exit**.
 When PresentMon reports FPS for the foreground app, the agent identifies the game and adds its name and logo to the
 snapshot (the phone shows them next to the FPS counter). It identifies games in this order:
 
-1. **`games.json`**: exe name, e.g. `dota2.exe` → Dota 2. Ships with ~20 popular games.
+1. **`games.json`**: exe name, e.g. `dota2.exe` → Dota 2, `hookshot.exe` → Ocarina of Time (Switch 2 remake logo). Ships
+   with ~20 popular games. An entry can name a `logoUrl` (https PNG/WebP/JPEG) for games not on Steam.
 2. **Any Steam game**: the exe's `...\steamapps\common\<folder>` is matched to that library's `appmanifest_*.acf`.
 3. **Emulators**: for the emulators listed in `games.json` (Project64, RetroArch, Dolphin…), the window title is
    matched against each game's `title` regex. For example, Ocarina of Time in Project64 or Ship of Harkinian (`soh.exe`).

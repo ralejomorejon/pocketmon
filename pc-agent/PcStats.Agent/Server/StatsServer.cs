@@ -61,8 +61,10 @@ public sealed class StatsServer : IAsyncDisposable
             if (_games is null || _logos is null || !file.EndsWith(".png", StringComparison.Ordinal)) return Results.NotFound();
             var path = _logos.GetFile(file[..^4], _games);
             if (path is null) return Results.NotFound();
+            Span<byte> head = stackalloc byte[12];
+            using (var fs = File.OpenRead(path)) head = head[..fs.Read(head)];
             ctx.Response.Headers.CacheControl = "public, max-age=86400";
-            return Results.File(path, "image/png");
+            return Results.File(path, Games.GameLogoService.SniffImageType(head) ?? "application/octet-stream");
         });
         app.Map("/ws", HandleWebSocketAsync);
 

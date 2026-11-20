@@ -3,7 +3,8 @@ using System.Text.RegularExpressions;
 
 namespace PcStats.Agent.Games;
 
-public sealed record GameInfo(string Id, string Name, int? SteamAppId = null, string? BundledLogo = null);
+/// <param name="LogoUrl">Direct download URL for the logo (PNG/WebP/JPEG) when it is not on Steam.</param>
+public sealed record GameInfo(string Id, string Name, int? SteamAppId = null, string? BundledLogo = null, string? LogoUrl = null);
 
 /// <summary>Identifies the foreground game from its exe name, Steam install folder, or (for emulators) window title.</summary>
 public sealed class GameCatalog
@@ -50,7 +51,8 @@ public sealed class GameCatalog
                 id,
                 g.TryGetProperty("name", out var n) ? n.GetString() ?? id : id,
                 g.TryGetProperty("steamAppId", out var s) && s.TryGetInt32(out var appId) ? appId : null,
-                g.TryGetProperty("logo", out var l) ? l.GetString() : null);
+                g.TryGetProperty("logo", out var l) ? l.GetString() : null,
+                g.TryGetProperty("logoUrl", out var u) && Uri.TryCreate(u.GetString(), UriKind.Absolute, out var uri) && uri.Scheme == Uri.UriSchemeHttps ? uri.ToString() : null);
             var exes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             if (g.TryGetProperty("exe", out var ex)) foreach (var e in ex.EnumerateArray()) exes.Add(e.GetString() ?? "");
             var title = g.TryGetProperty("title", out var t) && t.GetString() is { Length: > 0 } pattern

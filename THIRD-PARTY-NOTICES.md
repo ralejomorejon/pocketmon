@@ -24,5 +24,7 @@ The "Arial Black" font was used only to render the logo and icon images (`script
   [The Legend of Zelda Ocarina of Time 3D.png](https://commons.wikimedia.org/wiki/File:The_Legend_of_Zelda_Ocarina_of_Time_3D.png)
   (Wikimedia Commons, public domain as a text logo). The "3D" was removed and the black text recoloured for dark backgrounds.
   *The Legend of Zelda* is a trademark of Nintendo.
+- The Ocarina of Time (Switch 2 remake) logo, used when Hookshot (`hookshot.exe`) is running, is not distributed; the agent
+  downloads Nintendo's official logo from zeldaxtreme.com's press art on the user's PC for display only.
 - Other game logos are not distributed with PocketMon. The agent downloads them from the Steam CDN on the user's PC
   for display only. All game names and logos are trademarks of their respective owners; PocketMon is not affiliated with them.

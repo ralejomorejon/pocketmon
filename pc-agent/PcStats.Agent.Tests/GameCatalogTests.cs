@@ -18,6 +18,18 @@ public class GameCatalogTests
         Assert.Equal("dota2", g?.Id);
         Assert.Equal(570, g?.SteamAppId);
         Assert.Equal("zelda-oot", Catalog().Identify("soh.exe", null, null)?.Id);
+        var hookshot = Catalog().Identify("hookshot.exe", @"C:\Games\Hookshot Ocarina\bin\hookshot.exe", "Hookshot");
+        Assert.Equal("zelda-oot-remake", hookshot?.Id);
+        Assert.Equal("The Legend of Zelda: Ocarina of Time", hookshot?.Name);
+        Assert.StartsWith("https://", hookshot?.LogoUrl);
+    }
+
+    [Fact]
+    public void Logo_types_are_sniffed_from_content()
+    {
+        Assert.Equal("image/png", GameLogoService.SniffImageType([0x89, (byte)'P', (byte)'N', (byte)'G', 13, 10, 26, 10]));
+        Assert.Equal("image/webp", GameLogoService.SniffImageType("RIFF\0\0\0\0WEBPVP8 "u8.ToArray()));
+        Assert.Null(GameLogoService.SniffImageType("<html>"u8.ToArray()));
     }
 
     [Fact]
