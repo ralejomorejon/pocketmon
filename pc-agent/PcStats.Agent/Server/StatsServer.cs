@@ -24,16 +24,21 @@ public sealed class StatsServer : IAsyncDisposable
     private readonly SettingsStore _settings;
     private readonly PairingService _pairing;
     private readonly Sampler _sampler;
+    private readonly Games.GameCatalog? _games;
+    private readonly Games.GameLogoService? _logos;
     private readonly ConcurrentDictionary<Guid, CancellationTokenSource> _clients = new();
     private WebApplication? _app;
 
-    public StatsServer(ILoggerFactory loggerFactory, SettingsStore settings, PairingService pairing, Sampler sampler)
+    public StatsServer(ILoggerFactory loggerFactory, SettingsStore settings, PairingService pairing, Sampler sampler,
+        Games.GameCatalog? games = null, Games.GameLogoService? logos = null)
     {
         _loggerFactory = loggerFactory;
         _log = loggerFactory.CreateLogger("Server");
         _settings = settings;
         _pairing = pairing;
         _sampler = sampler;
+        _games = games;
+        _logos = logos;
         _pairing.TokensRevoked += DisconnectAll;
     }
 
@@ -51,6 +56,14 @@ public sealed class StatsServer : IAsyncDisposable
         app.UseWebSockets(new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSeconds(15) });
         UseWebApp(app);
         app.MapGet("/health", () => Results.Text("ok"));
+        app.MapGet("/logos/{file}", (string file, HttpContext ctx) =>
+        {
+            if (_games is null || _logos is null || !file.EndsWith(".png", StringComparison.Ordinal)) return Results.NotFound();
+            var path = _logos.GetFile(file[..^4], _games);
+            if (path is null) return Results.NotFound();
+            ctx.Response.Headers.CacheControl = "public, max-age=86400";
+            return Results.File(path, "image/png");
+        });
         app.Map("/ws", HandleWebSocketAsync);
 
         await app.StartAsync();

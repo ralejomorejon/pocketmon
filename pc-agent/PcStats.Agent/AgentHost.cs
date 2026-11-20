@@ -20,6 +20,8 @@ public sealed class AgentHost : IAsyncDisposable
     public PairingService Pairing { get; }
     public PresentMonRunner PresentMon { get; }
     public Sampler Sampler { get; }
+    public Games.GameCatalog Games { get; }
+    public Games.GameLogoService Logos { get; }
     public StatsServer Server { get; }
     public DiscoveryBeacon Discovery { get; }
     public UsbHelper Usb { get; }
@@ -31,8 +33,13 @@ public sealed class AgentHost : IAsyncDisposable
         Settings = new SettingsStore();
         Pairing = new PairingService(Settings);
         PresentMon = new PresentMonRunner(loggerFactory.CreateLogger("PresentMon"));
-        Sampler = new Sampler(loggerFactory.CreateLogger("Sensors"), PresentMon);
-        Server = new StatsServer(loggerFactory, Settings, Pairing, Sampler);
+        Games = PcStats.Agent.Games.GameCatalog.Load(
+            Path.Combine(AppContext.BaseDirectory, "games.json"),
+            Path.Combine(SettingsStore.DefaultDirectory, "games.json"));
+        Logos = new PcStats.Agent.Games.GameLogoService(loggerFactory.CreateLogger("Games"),
+            Path.Combine(SettingsStore.DefaultDirectory, "logos"), Path.Combine(AppContext.BaseDirectory, "logos"));
+        Sampler = new Sampler(loggerFactory.CreateLogger("Sensors"), PresentMon, Games, Logos);
+        Server = new StatsServer(loggerFactory, Settings, Pairing, Sampler, Games, Logos);
         Discovery = new DiscoveryBeacon(loggerFactory.CreateLogger("Discovery"), Settings.PcId);
         Usb = new UsbHelper(loggerFactory.CreateLogger("Usb"));
 
@@ -64,11 +71,16 @@ public sealed class AgentHost : IAsyncDisposable
         await Server.StartAsync();
         Discovery.Start();
         Usb.Start();
+        // Fetch logos for popular Steam games in the background so they're ready when a game starts.
+        _ = Logos.PrefetchAsync(Games.Games, _prefetch.Token);
     }
+
+    private readonly CancellationTokenSource _prefetch = new();
 
     public async ValueTask DisposeAsync()
     {
         _log.LogInformation("PocketMon Agent stopping");
+        _prefetch.Cancel();
         Usb.Dispose();
         Discovery.Dispose();
         await Server.DisposeAsync();

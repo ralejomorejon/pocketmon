@@ -27,6 +27,39 @@ internal static class NativeMethods
         GetWindowThreadProcessId(hwnd, out var pid);
         return pid == 0 ? null : (int)pid;
     }
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern int GetWindowText(IntPtr hWnd, System.Text.StringBuilder text, int maxCount);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern IntPtr OpenProcess(uint access, bool inherit, int pid);
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern bool QueryFullProcessImageName(IntPtr process, int flags, System.Text.StringBuilder path, ref int size);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool CloseHandle(IntPtr handle);
+
+    /// <summary>Full exe path and window title of the foreground window's process (best effort).</summary>
+    public static (string? Path, string? Title) GetForegroundWindowInfo()
+    {
+        var hwnd = GetForegroundWindow();
+        if (hwnd == IntPtr.Zero) return (null, null);
+        var title = new System.Text.StringBuilder(512);
+        GetWindowText(hwnd, title, title.Capacity);
+        GetWindowThreadProcessId(hwnd, out var pid);
+        string? path = null;
+        const uint QueryLimitedInformation = 0x1000;
+        var h = OpenProcess(QueryLimitedInformation, false, (int)pid);
+        if (h != IntPtr.Zero)
+        {
+            var sb = new System.Text.StringBuilder(1024);
+            var size = sb.Capacity;
+            if (QueryFullProcessImageName(h, 0, sb, ref size)) path = sb.ToString(0, size);
+            CloseHandle(h);
+        }
+        return (path, title.Length > 0 ? title.ToString() : null);
+    }
 }
 
 /// <summary>Job object that kills assigned child processes when the agent exits, even on a crash.</summary>

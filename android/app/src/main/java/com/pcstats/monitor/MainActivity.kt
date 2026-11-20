@@ -90,6 +90,7 @@ class MainActivity : ComponentActivity() {
             Screen.DASHBOARD -> {
                 val snapshot by vm.snapshot.collectAsStateWithLifecycle()
                 val welcome by vm.connection.welcome.collectAsStateWithLifecycle()
+                val httpBase by vm.connection.httpBase.collectAsStateWithLifecycle()
                 val stats by vm.stats.collectAsStateWithLifecycle()
                 DashboardScreen(
                     state = state,
@@ -98,6 +99,7 @@ class MainActivity : ComponentActivity() {
                     stats = stats,
                     settings = settings,
                     savedPcName = savedPc?.name,
+                    httpBase = httpBase,
                     onOpenSettings = vm::openSettings,
                     onDisconnect = vm::disconnect,
                 )

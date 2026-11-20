@@ -31,6 +31,9 @@ object Hosts {
         return "ws://$authority/ws"
     }
 
+    /** HTTP root of the agent at [host], e.g. "http://192.168.1.5:28555". */
+    fun httpBase(host: String): String = wsUrl(host).replaceFirst("ws://", "http://").removeSuffix("/ws")
+
     fun transportOf(host: String): Transport {
         val h = normalize(host)
         return if (h == USB_HOST || h.startsWith("$USB_HOST:") || h == "localhost") Transport.USB else Transport.WIFI

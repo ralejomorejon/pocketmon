@@ -38,9 +38,8 @@ function legend(items) {
 }
 
 function clockPanel(m) {
-  const fpsVal = m.s?.fps?.value;
   const note = m.conn.note;
-  const text = note ?? (isNum(fpsVal) ? `${F.fps(fpsVal)} FPS · ${m.s.fps.app ?? ''}` : (m.conn.pcName ?? ''));
+  const text = note ?? (m.conn.pcName ?? '');
   return `<div class="panel clock">
     <div class="day" id="clk-day"></div>
     <div class="time-box">${fit('<span id="clk-time"></span><sup id="clk-sec"></sup>', 76, 'time')}</div>
@@ -134,9 +133,19 @@ function memoryPanel(m) {
     </div></div>`;
 }
 
+/** Game logo (or name) with the FPS counter in the display font. */
+function nowPlaying(fps) {
+  const title = fps.game ?? fps.app?.replace(/\.exe$/i, '') ?? '';
+  const logo = fps.logo
+    ? `<img class="np-logo" src="${e(fps.logo)}" alt="${e(title)}">`
+    : `<div class="np-name">${fit(e(title), 20)}</div>`;
+  return `<div class="np">${logo}<div class="np-fps"><span class="np-num">${e(F.fps(fps.value))}</span><span class="np-unit">FPS</span></div></div>`;
+}
+
 function storagePanel(m) {
   const disks = m.s?.disks ?? [];
-  const rows = disks.slice(0, 4).map((d) => {
+  const fps = m.s?.fps;
+  const rows = disks.slice(0, fps ? 2 : 4).map((d) => {
     const used = isNum(d.freeMb) && isNum(d.totalMb) && d.totalMb > 0 ? 1 - d.freeMb / d.totalMb : null;
     const color = used === null ? C.label : used >= 0.9 ? C.heat : used >= 0.75 ? C.amber : C.cool;
     return `<div class="disk">
@@ -145,7 +154,7 @@ function storagePanel(m) {
         <div class="row">${fit(`${e(F.size(d.freeMb))} free of ${e(F.size(d.totalMb))}`, 9.5, 'muted grow')}${isNum(d.temp) ? `<span class="muted t">${e(m.t(d.temp))}°</span>` : ''}</div></div>
     </div>`;
   });
-  return `<div class="panel">${header('Storage')}<div class="disks">${rows.join('') || `<div class="muted">${F.DASH}</div>`}</div></div>`;
+  return `<div class="panel">${header('Storage')}<div class="disks">${rows.join('') || `<div class="muted">${F.DASH}</div>`}</div>${fps ? nowPlaying(fps) : ''}</div>`;
 }
 
 export function modern(m, landscape) {
@@ -202,7 +211,7 @@ function classicTiles(m) {
     `${tileHeader('FANS')}${(s?.fans ?? []).length ? s.fans.map((x) => metric(x.name ?? 'Fan', F.rpm(x.rpm))).join('') : `<div class="muted">${F.DASH}</div>`}`,
   ];
   if (s?.fps) {
-    tiles.push(`${tileHeader('FPS', s.fps.app)}<div class="fpsbig">${e(F.fps(s.fps.value))}</div><div class="sp">${sparkline(m.stats.fpsSeries, C.accent + 'B3')}</div>`);
+    tiles.push(`${tileHeader('FPS', s.fps.logo ? null : (s.fps.game ?? s.fps.app))}${s.fps.logo ? `<img class="fps-logo" src="${e(s.fps.logo)}" alt="${e(s.fps.game ?? '')}">` : ''}<div class="fpsbig">${e(F.fps(s.fps.value))}</div><div class="sp">${sparkline(m.stats.fpsSeries, C.accent + 'B3')}</div>`);
   }
   return tiles;
 }

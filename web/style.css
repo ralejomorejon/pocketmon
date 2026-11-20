@@ -15,6 +15,13 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
+
+@font-face {
+  font-family: 'Orbitron';
+  src: url('fonts/Orbitron.ttf') format('truetype');
+  font-weight: 400 900;
+  font-display: block;
+}
 html, body { height: 100%; background: var(--black); color: var(--value); overflow: hidden; }
 body {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -121,6 +128,17 @@ svg text { font-family: inherit; }
 .dtext .fit { height: 13px; }
 .dtext .t { font-size: 9.5px; margin-left: 4px; }
 
+/* Now playing: game logo + FPS in the display font, filling the free space under storage. */
+.disks { flex: none; }
+.np { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--divider); }
+.np-logo { flex: 1 1 0; min-height: 0; max-width: 100%; object-fit: contain; }
+.np-name { width: 100%; height: 26px; text-align: center; font-family: 'Orbitron', sans-serif; font-weight: 700; }
+.np-name .fit { height: 26px; }
+.np-fps { display: flex; align-items: baseline; gap: 6px; font-family: 'Orbitron', sans-serif; line-height: 1; }
+.np-num { font-size: 44px; font-weight: 900; color: var(--value); letter-spacing: 1px; font-variant-numeric: tabular-nums; }
+.np-unit { font-size: 12px; font-weight: 700; color: #ff5b3a; letter-spacing: 2px; }
+.fps-logo { max-height: 48px; max-width: 100%; object-fit: contain; align-self: flex-start; margin-bottom: 4px; }
+
 /* ---------------------------------------------------------------- classic */
 
 .classic { gap: 6px; }
@@ -144,7 +162,7 @@ svg text { font-family: inherit; }
 .metric b { font-weight: 400; }
 .sp { flex: 1; min-height: 8px; display: flex; justify-content: flex-end; padding: 2px 0; }
 .sp svg { width: 100%; height: 100%; }
-.fpsbig { font-size: 44px; font-weight: 300; }
+.fpsbig { font-size: 44px; font-weight: 900; font-family: 'Orbitron', sans-serif; }
 
 /* ---------------------------------------------------------------- pages */
 

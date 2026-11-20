@@ -139,6 +139,10 @@ data class FanStats(
 data class FpsStats(
     val app: String? = null,
     val value: Double? = null,
+    /** Display name when the agent recognised the game. */
+    val game: String? = null,
+    /** Agent-relative logo URL, e.g. "/logos/dota2.png". */
+    val logo: String? = null,
 )
 
 /** A server message type this client does not understand; ignored. */

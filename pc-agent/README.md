@@ -64,6 +64,23 @@ starts elevated without a UAC prompt), **Open config folder**, **Exit**.
 
 - `%AppData%\PcStatsAgent\config.json`: `pcId`, `authorizedTokenHashes`, `intervalMs` (default per-client interval)
 - `%AppData%\PcStatsAgent\logs\agent-yyyyMMdd.log`: logs (kept 14 days)
+- `%AppData%\PcStatsAgent\logos\<id>.png`: downloaded game logos. Drop your own PNG here to override or add one.
+- `%AppData%\PcStatsAgent\games.json` (optional): your own game entries, same format as the bundled `games.json`.
+
+## Game logos
+
+When PresentMon reports FPS for the foreground app, the agent identifies the game and adds its name and logo to the
+snapshot (the phone shows them next to the FPS counter). It identifies games in this order:
+
+1. **`games.json`**: exe name, e.g. `dota2.exe` → Dota 2. Ships with ~20 popular games.
+2. **Any Steam game**: the exe's `...\steamapps\common\<folder>` is matched to that library's `appmanifest_*.acf`.
+3. **Emulators**: for the emulators listed in `games.json` (Project64, RetroArch, Dolphin…), the window title is
+   matched against each game's `title` regex. For example, Ocarina of Time in Project64 or Ship of Harkinian (`soh.exe`).
+
+Logos for Steam games are downloaded from the Steam CDN (`https://cdn.cloudflare.steamstatic.com/steam/apps/<appid>/logo.png`)
+into the cache: the catalog's games in the background at startup, any other Steam game the first time it's detected.
+They are not shipped with PocketMon because they're the games' own artwork. The bundled `logos/zelda-oot.png` is derived from a
+public-domain Wikimedia Commons file (see THIRD-PARTY-NOTICES.md). Logos are served at `GET /logos/<id>.png`.
 
 ## Notes
 

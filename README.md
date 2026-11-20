@@ -48,7 +48,8 @@ The same web app also works on Android, tablets or any browser (`http://<pc-ip>:
 
 - Two dashboard designs (**Modern** and **Classic**), portrait and landscape, scaled to fill any screen
 - CPU and GPU temperature gauges with load, power and clock, per-core load, hotspot, VRAM
-- Memory, storage (free space and temperature), network (rate, peaks, totals), FPS of the foreground game
+- Memory, storage (free space and temperature), network (rate, peaks, totals)
+- **Now playing**: the foreground game's logo with a big FPS counter. Popular games and any Steam game are recognised automatically; emulated classics like Zelda: Ocarina of Time are recognised by window title.
 - Wi-Fi with automatic discovery, or USB; pairing code + per-device tokens
 - OLED-friendly: pure black background, dim static labels, slow pixel shifting; the screen stays on at normal brightness
 

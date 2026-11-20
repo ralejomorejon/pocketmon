@@ -9,6 +9,7 @@ PocketMon uses or bundles the following open-source components.
 | [QRCoder](https://github.com/codebude/QRCoder) | PC agent — tray QR code | MIT |
 | ASP.NET Core / .NET runtime | PC agent | MIT |
 | [NoSleep.js](https://github.com/richtr/NoSleep.js) (bundled in `web/vendor/`) | Web app — keep screen on | MIT, © Rich Tibbett — see `web/vendor/NoSleep.LICENSE` |
+| [Orbitron](https://github.com/theleagueof/orbitron) font (`web/fonts/`, Android `res/font/`) | FPS counter | SIL Open Font License 1.1 — see `web/fonts/Orbitron-OFL.txt` |
 | AndroidX, Jetpack Compose | Android app | Apache-2.0 |
 | [OkHttp](https://github.com/square/okhttp) | Android app | Apache-2.0 |
 | kotlinx.serialization, kotlinx.coroutines | Android app | Apache-2.0 |
@@ -16,3 +17,12 @@ PocketMon uses or bundles the following open-source components.
 [PawnIO](https://github.com/namazso/PawnIO) is not bundled; it is installed separately (e.g. `winget install namazso.PawnIO`) and is used by LibreHardwareMonitor to read CPU sensors.
 
 The "Arial Black" font was used only to render the logo and icon images (`scripts/generate-branding.ps1`); no font files are distributed.
+
+## Game logos
+
+- `pc-agent/PcStats.Agent/logos/zelda-oot.png` is adapted from
+  [The Legend of Zelda Ocarina of Time 3D.png](https://commons.wikimedia.org/wiki/File:The_Legend_of_Zelda_Ocarina_of_Time_3D.png)
+  (Wikimedia Commons, public domain as a text logo). The "3D" was removed and the black text recoloured for dark backgrounds.
+  *The Legend of Zelda* is a trademark of Nintendo.
+- Other game logos are not distributed with PocketMon. The agent downloads them from the Steam CDN on the user's PC
+  for display only. All game names and logos are trademarks of their respective owners; PocketMon is not affiliated with them.

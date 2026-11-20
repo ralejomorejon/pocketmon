@@ -150,4 +150,16 @@ class ProtocolTest {
     }
 
     private fun JsonObject.str(key: String) = this[key]?.jsonPrimitive?.content
+
+    @Test
+    fun parsesGameAndLogoAndBuildsSafeLogoUrls() {
+        val s = Protocol.decodeServerMessage(
+            """{"type":"snapshot","fps":{"app":"dota2.exe","value":143.7,"game":"Dota 2","logo":"/logos/dota2.png"}}""",
+        ) as Snapshot
+        assertEquals("Dota 2", s.fps?.game)
+        val base = com.pcstats.monitor.net.Hosts.httpBase("192.168.1.5")
+        assertEquals("http://192.168.1.5:28555", base)
+        assertEquals("http://192.168.1.5:28555/logos/dota2.png", com.pcstats.monitor.ui.components.logoUrl(base, s.fps?.logo))
+        assertNull(com.pcstats.monitor.ui.components.logoUrl(base, "http://evil.example/x.png"))
+    }
 }

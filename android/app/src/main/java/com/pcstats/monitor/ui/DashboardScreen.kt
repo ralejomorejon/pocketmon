@@ -62,6 +62,7 @@ import com.pcstats.monitor.protocol.DiskStats
 import com.pcstats.monitor.protocol.Snapshot
 import com.pcstats.monitor.protocol.WelcomeMessage
 import com.pcstats.monitor.ui.components.CoreBars
+import com.pcstats.monitor.ui.components.NowPlaying
 import com.pcstats.monitor.ui.components.FitText
 import com.pcstats.monitor.ui.components.RingGauge
 import com.pcstats.monitor.ui.components.TempGauge
@@ -100,6 +101,7 @@ fun DashboardScreen(
     stats: SessionStats,
     settings: AppSettings,
     savedPcName: String?,
+    httpBase: String?,
     onOpenSettings: () -> Unit,
     onDisconnect: () -> Unit,
 ) {
@@ -139,13 +141,13 @@ fun DashboardScreen(
             if (settings.dashboardStyle == DashboardStyle.CLASSIC) {
                 val (w, h) = if (landscape) ClassicLandscapeDesign else ClassicPortraitDesign
                 FitToDesign(maxWidth, maxHeight, w, h) {
-                    ClassicDashboard(state, snapshot, welcome, stats, settings, savedPcName)
+                    ClassicDashboard(state, snapshot, welcome, stats, settings, savedPcName, httpBase)
                 }
                 return@BoxWithConstraints
             }
             val (designW, designH) = if (landscape) LandscapeDesign else PortraitDesign
             FitToDesign(maxWidth, maxHeight, designW, designH) {
-                val model = DashModel(snapshot, welcome, stats, settings, state, savedPcName)
+                val model = DashModel(snapshot, welcome, stats, settings, state, savedPcName, httpBase)
                 if (landscape) LandscapeLayout(model) else PortraitLayout(model)
             }
         }
@@ -200,6 +202,8 @@ private class DashModel(
     val settings: AppSettings,
     val state: ConnectionState,
     val savedPcName: String?,
+    /** Agent HTTP root (e.g. "http://192.168.1.5:28555") for game logos. */
+    val httpBase: String?,
 ) {
     val f get() = settings.useFahrenheit
     val deg get() = if (f) "°F" else "°C"
@@ -357,7 +361,6 @@ private fun ConnectionLine(m: DashModel) {
         is ConnectionState.NeedsPairing -> null to "Needs pairing"
         ConnectionState.Disconnected -> null to "Disconnected"
     }
-    val fps = m.s?.fps?.value
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
         if (badge != null) {
             Text(
@@ -366,11 +369,7 @@ private fun ConnectionLine(m: DashModel) {
             )
             Spacer(Modifier.width(6.dp))
         }
-        val text = when {
-            note != null -> note
-            fps != null -> "${Format.fps(fps)} FPS · ${m.s?.fps?.app ?: ""}"
-            else -> (m.state as? ConnectionState.Connected)?.pcName ?: m.savedPcName ?: ""
-        }
+        val text = note ?: (m.state as? ConnectionState.Connected)?.pcName ?: m.savedPcName ?: ""
         Text(
             text, color = if (note != null) Palette.Warm else Palette.Label, fontSize = 10.sp,
             maxLines = 1, overflow = TextOverflow.Ellipsis,
@@ -528,15 +527,24 @@ private fun ColumnScope.MemoryPanel(m: DashModel) {
 @Composable
 private fun ColumnScope.StoragePanel(m: DashModel) {
     PanelHeader("Storage", live = true)
+    val fps = m.s?.fps
     Spacer(Modifier.height(8.dp))
     val disks = m.s?.disks.orEmpty()
     if (disks.isEmpty()) {
         Text(DASH, color = Palette.Label, fontSize = 14.sp)
-        return
+    } else {
+        Column(
+            if (fps == null) Modifier.fillMaxWidth().weight(1f) else Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            // Show as many drives as fit comfortably (rows are ~44 dp); fewer while a game is shown below.
+            disks.take(if (fps == null) 4 else 2).forEach { d -> DiskRow(m, d, Modifier) }
+        }
     }
-    Column(Modifier.fillMaxWidth().weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        // Show as many drives as fit comfortably (rows are ~44 dp).
-        disks.take(4).forEach { d -> DiskRow(m, d, Modifier.weight(1f, fill = false)) }
+    if (fps != null) {
+        Spacer(Modifier.height(8.dp))
+        Box(Modifier.fillMaxWidth().height(1.dp).background(Palette.Divider))
+        NowPlaying(fps, m.httpBase, Modifier.fillMaxWidth().weight(1f).padding(top = 8.dp))
     }
 }
 

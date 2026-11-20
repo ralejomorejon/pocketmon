@@ -76,6 +76,10 @@ class ConnectionManager(
     private val _welcome = MutableStateFlow<WelcomeMessage?>(null)
     val welcome: StateFlow<WelcomeMessage?> = _welcome.asStateFlow()
 
+    /** HTTP root of the currently connected agent (for game logos), or null when not connected. */
+    private val _httpBase = MutableStateFlow<String?>(null)
+    val httpBase: StateFlow<String?> = _httpBase.asStateFlow()
+
     private var loopJob: Job? = null
     private var hostTrackerJob: Job? = null
 
@@ -236,6 +240,7 @@ class ConnectionManager(
         val transport = Hosts.transportOf(session.host)
         val pcName = welcome.pcName ?: pc.name
         _welcome.value = welcome
+        _httpBase.value = Hosts.httpBase(session.host)
         if (welcome.pcId == null || welcome.pcId == pc.pcId) {
             if (transport == Transport.WIFI && pc.lastHost != session.host) repo.updateLastHost(pc.pcId, session.host)
             if (welcome.pcName != null && welcome.pcName != pc.name) repo.updatePcName(pc.pcId, welcome.pcName)

@@ -30,7 +30,12 @@ import com.pcstats.monitor.net.Transport
 import com.pcstats.monitor.protocol.Snapshot
 import com.pcstats.monitor.protocol.WelcomeMessage
 import com.pcstats.monitor.ui.components.ArcGauge
+import com.pcstats.monitor.ui.components.FpsCounter
 import com.pcstats.monitor.ui.components.Sparkline
+import com.pcstats.monitor.ui.components.logoUrl
+import com.pcstats.monitor.ui.components.rememberRemoteImage
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
 import com.pcstats.monitor.util.DASH
 import com.pcstats.monitor.util.Format
 import com.pcstats.monitor.util.SampleSeries
@@ -45,12 +50,13 @@ fun ClassicDashboard(
     stats: SessionStats,
     settings: AppSettings,
     savedPcName: String?,
+    httpBase: String? = null,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier.fillMaxSize()) {
         StatusLine(state, savedPcName)
         Spacer(Modifier.height(6.dp))
-        TileGrid(snapshot, welcome, stats, settings, Modifier.weight(1f))
+        TileGrid(snapshot, welcome, stats, settings, httpBase, Modifier.weight(1f))
     }
 }
 
@@ -84,7 +90,7 @@ private fun StatusLine(state: ConnectionState, savedPcName: String?) {
 private enum class TileKind { CPU, GPU, RAM, NET, FANS, FPS }
 
 @Composable
-private fun TileGrid(s: Snapshot?, welcome: WelcomeMessage?, stats: SessionStats, settings: AppSettings, modifier: Modifier) {
+private fun TileGrid(s: Snapshot?, welcome: WelcomeMessage?, stats: SessionStats, settings: AppSettings, httpBase: String?, modifier: Modifier) {
     BoxWithConstraints(modifier.fillMaxWidth()) {
         val landscape = maxWidth > maxHeight
         val columns = if (landscape) 3 else 2
@@ -103,7 +109,7 @@ private fun TileGrid(s: Snapshot?, welcome: WelcomeMessage?, stats: SessionStats
                                 TileKind.RAM -> RamTile(s, stats.ramSeries)
                                 TileKind.NET -> NetTile(s, stats)
                                 TileKind.FANS -> FansTile(s)
-                                TileKind.FPS -> FpsTile(s, stats.fpsSeries)
+                                TileKind.FPS -> FpsTile(s, stats.fpsSeries, httpBase)
                             }
                         }
                     }
@@ -247,14 +253,14 @@ private fun ColumnScope.FansTile(s: Snapshot?) {
 }
 
 @Composable
-private fun ColumnScope.FpsTile(s: Snapshot?, series: SampleSeries) {
+private fun ColumnScope.FpsTile(s: Snapshot?, series: SampleSeries, httpBase: String?) {
     val f = s?.fps ?: return
-    TileHeader("FPS", f.app)
-    Text(
-        Format.fps(f.value),
-        color = if (f.value == null) Palette.Label else Palette.Value,
-        fontSize = 44.sp,
-        fontWeight = FontWeight.Light,
-    )
+    val logo = rememberRemoteImage(logoUrl(httpBase, f.logo))
+    TileHeader("FPS", if (logo == null) f.game ?: f.app else null)
+    if (logo != null) {
+        Image(logo, contentDescription = f.game, contentScale = ContentScale.Fit, alignment = Alignment.CenterStart,
+            modifier = Modifier.fillMaxWidth().height(44.dp))
+    }
+    FpsCounter(f.value, 44.sp)
     SparkArea(series)
 }

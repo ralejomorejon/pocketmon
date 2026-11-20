@@ -27,6 +27,8 @@
 
   <ItemGroup>
     <None Include="tools\**" CopyToOutputDirectory="PreserveNewest" LinkBase="tools" />
+    <None Include="logos\**" CopyToOutputDirectory="PreserveNewest" LinkBase="logos" />
+    <None Include="games.json" CopyToOutputDirectory="PreserveNewest" />
     <!-- Phone web app (PWA), served at / by StatsServer. -->
     <None Include="..\..\web\**" Exclude="..\..\web\test\**;..\..\web\README.md" CopyToOutputDirectory="PreserveNewest" LinkBase="wwwroot" />
   </ItemGroup>

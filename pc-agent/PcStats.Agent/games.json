@@ -1,0 +1,29 @@
+{
+  "_comment": "Game detection for the FPS card. 'exe' matches the foreground process name; 'title' (regex) is only checked for the emulators listed below. Logos come from 'logo' (bundled in logos/) or the Steam CDN via 'steamAppId'. Add your own entries in %AppData%\\PcStatsAgent\\games.json and drop custom logos in %AppData%\\PcStatsAgent\\logos\\<id>.png.",
+  "emulators": [
+    "Project64.exe", "retroarch.exe", "simple64-gui.exe", "rmg.exe", "ares.exe", "mupen64plus-ui-console.exe",
+    "Dolphin.exe", "Cemu.exe", "Ryujinx.exe", "yuzu.exe", "suyu.exe", "citra-qt.exe", "azahar.exe", "lime3ds-gui.exe"
+  ],
+  "games": [
+    { "id": "zelda-oot", "name": "The Legend of Zelda: Ocarina of Time", "exe": ["soh.exe"], "title": "(?i)ocarina of time|\\bthe legend of zelda\\b(?!.*majora)", "logo": "zelda-oot.png" },
+    { "id": "dota2", "name": "Dota 2", "exe": ["dota2.exe"], "steamAppId": 570 },
+    { "id": "cs2", "name": "Counter-Strike 2", "exe": ["cs2.exe"], "steamAppId": 730 },
+    { "id": "cyberpunk2077", "name": "Cyberpunk 2077", "exe": ["Cyberpunk2077.exe"], "steamAppId": 1091500 },
+    { "id": "eldenring", "name": "Elden Ring", "exe": ["eldenring.exe"], "steamAppId": 1245620 },
+    { "id": "gta5", "name": "Grand Theft Auto V", "exe": ["GTA5.exe", "GTA5_Enhanced.exe"], "steamAppId": 271590 },
+    { "id": "rdr2", "name": "Red Dead Redemption 2", "exe": ["RDR2.exe"], "steamAppId": 1174180 },
+    { "id": "apex", "name": "Apex Legends", "exe": ["r5apex.exe", "r5apex_dx12.exe"], "steamAppId": 1172470 },
+    { "id": "bg3", "name": "Baldur's Gate 3", "exe": ["bg3.exe", "bg3_dx11.exe"], "steamAppId": 1086940 },
+    { "id": "rocketleague", "name": "Rocket League", "exe": ["RocketLeague.exe"], "steamAppId": 252950 },
+    { "id": "pubg", "name": "PUBG: Battlegrounds", "exe": ["TslGame.exe"], "steamAppId": 578080 },
+    { "id": "witcher3", "name": "The Witcher 3: Wild Hunt", "exe": ["witcher3.exe"], "steamAppId": 292030 },
+    { "id": "helldivers2", "name": "Helldivers 2", "exe": ["helldivers2.exe"], "steamAppId": 553850 },
+    { "id": "rust", "name": "Rust", "exe": ["RustClient.exe"], "steamAppId": 252490 },
+    { "id": "overwatch2", "name": "Overwatch 2", "exe": ["Overwatch.exe"], "steamAppId": 2357570 },
+    { "id": "marvelrivals", "name": "Marvel Rivals", "exe": ["Marvel-Win64-Shipping.exe"], "steamAppId": 2767030 },
+    { "id": "mhwilds", "name": "Monster Hunter Wilds", "exe": ["MonsterHunterWilds.exe"], "steamAppId": 2246340 },
+    { "id": "fortnite", "name": "Fortnite", "exe": ["FortniteClient-Win64-Shipping.exe"] },
+    { "id": "valorant", "name": "VALORANT", "exe": ["VALORANT-Win64-Shipping.exe"] },
+    { "id": "lol", "name": "League of Legends", "exe": ["League of Legends.exe"] }
+  ]
+}

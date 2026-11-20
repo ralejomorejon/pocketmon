@@ -51,6 +51,9 @@ Server → client every `intervalMs`:
 }
 ```
 `fps` is `null` when no game/3D app is presenting in the foreground or PresentMon is unavailable.
+When the agent recognises the game, `fps` also has `"game":"Dota 2"` (display name) and, once the logo is available,
+`"logo":"/logos/dota2.png"`. That's a path on the agent's HTTP server (`http://<host>:28555/logos/<id>.png`, PNG with
+transparency).
 `usage` values are 0–100 percent; temps in °C; `*Bps` in bytes per second.
 `tempLimit` is the CPU throttle temperature (TjMax) when reported; `coreLoads` has one entry per physical core.
 `sentBytes`/`receivedBytes` are Windows interface counters (since the adapters came up). `disks` lists fixed drives

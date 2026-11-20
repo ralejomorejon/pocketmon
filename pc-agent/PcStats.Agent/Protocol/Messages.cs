@@ -97,7 +97,9 @@ public sealed class NetStats
 
 public sealed record FanStats(string Name, long Rpm);
 
-public sealed record FpsStats(string App, double? Value);
+/// <param name="Game">Display name when the foreground app is a known game.</param>
+/// <param name="Logo">Agent-relative URL of the game's logo (e.g. "/logos/dota2.png") once available.</param>
+public sealed record FpsStats(string App, double? Value, string? Game = null, string? Logo = null);
 
 public sealed class WelcomeMessage
 {
