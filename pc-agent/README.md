@@ -66,6 +66,10 @@ starts elevated without a UAC prompt), **Open config folder**, **Exit**.
 - `%AppData%\PcStatsAgent\logs\agent-yyyyMMdd.log`: logs (kept 14 days)
 - `%AppData%\PcStatsAgent\logos\<id>.png`: downloaded game logos. Drop your own PNG here to override or add one.
 - `%AppData%\PcStatsAgent\games.json` (optional): your own game entries, same format as the bundled `games.json`.
+- `%AppData%\PcStatsAgent\fonts\<id>.otf|.ttf` (optional): fonts for the FPS counter, served to phones at `/fonts/<id>`.
+  The Zelda entries prefer `hylia-serif`: put Hylia Serif (free download from https://artsyomni.com/hyliaserif) there
+  as `hylia-serif.otf`. Without it they fall back to the bundled Cinzel. Such fonts aren't shipped with PocketMon
+  because their licences don't allow redistribution.
 
 ## Game logos
 

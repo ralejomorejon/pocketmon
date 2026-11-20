@@ -19,6 +19,8 @@ PocketMon uses or bundles the following open-source components.
 
 The "Arial Black" font was used only to render the logo and icon images (`scripts/generate-branding.ps1`); no font files are distributed.
 
+Hylia Serif (Omni Jacala) is **not** distributed. If the user installs it on their PC, the agent serves it to their own phone.
+
 ## Game logos
 
 - `pc-agent/PcStats.Agent/logos/zelda-oot.png` is adapted from

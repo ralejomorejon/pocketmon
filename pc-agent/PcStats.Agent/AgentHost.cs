@@ -22,6 +22,7 @@ public sealed class AgentHost : IAsyncDisposable
     public Sampler Sampler { get; }
     public Games.GameCatalog Games { get; }
     public Games.GameLogoService Logos { get; }
+    public Fonts.FontService Fonts { get; }
     public StatsServer Server { get; }
     public DiscoveryBeacon Discovery { get; }
     public UsbHelper Usb { get; }
@@ -38,8 +39,9 @@ public sealed class AgentHost : IAsyncDisposable
             Path.Combine(SettingsStore.DefaultDirectory, "games.json"));
         Logos = new PcStats.Agent.Games.GameLogoService(loggerFactory.CreateLogger("Games"),
             Path.Combine(SettingsStore.DefaultDirectory, "logos"), Path.Combine(AppContext.BaseDirectory, "logos"));
-        Sampler = new Sampler(loggerFactory.CreateLogger("Sensors"), PresentMon, Games, Logos);
-        Server = new StatsServer(loggerFactory, Settings, Pairing, Sampler, Games, Logos);
+        Fonts = new PcStats.Agent.Fonts.FontService(Path.Combine(SettingsStore.DefaultDirectory, "fonts"));
+        Sampler = new Sampler(loggerFactory.CreateLogger("Sensors"), PresentMon, Games, Logos, Fonts);
+        Server = new StatsServer(loggerFactory, Settings, Pairing, Sampler, Games, Logos, Fonts);
         Discovery = new DiscoveryBeacon(loggerFactory.CreateLogger("Discovery"), Settings.PcId);
         Usb = new UsbHelper(loggerFactory.CreateLogger("Usb"));
 

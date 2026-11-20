@@ -142,11 +142,26 @@ function nowPlaying(fps, row = false) {
   return `<div class="np${row ? ' row' : ''}">${logo}${fpsCounter(fps)}</div>`;
 }
 
-/** FPS number + label. Per-game style (e.g. Zelda: Cinzel in the logo's gold); the agent sends a font id and #RRGGBB. */
+/** FPS number + label. Per-game style (e.g. Zelda: Hylia Serif / Cinzel in the logo's gold); the agent sends a font id and #RRGGBB. */
 function fpsCounter(fps, cls = '') {
-  const font = /^[a-z0-9-]+$/.test(fps.font ?? '') ? ` font-${fps.font}` : '';
-  const color = /^#[0-9a-f]{6}$/i.test(fps.color ?? '') ? ` style="--np-color:${fps.color}"` : '';
-  return `<div class="np-fps${font} ${cls}"${color}><span class="np-num">${e(F.fps(fps.value))}</span><span class="np-unit">FPS</span></div>`;
+  const id = /^[a-z0-9][a-z0-9-]{0,31}$/.test(fps.font ?? '') ? fps.font : null;
+  let font = '';
+  let family = '';
+  if (id === 'cinzel' || id === 'orbitron') font = ` font-${id}`;
+  else if (id) {
+    // A font installed on the PC, served by the agent; loaded once per page.
+    if (!document.getElementById(`pm-font-${id}`)) {
+      const style = document.createElement('style');
+      style.id = `pm-font-${id}`;
+      style.textContent = `@font-face { font-family: 'pm-${id}'; src: url('/fonts/${id}'); font-display: block; }`;
+      document.head.appendChild(style);
+    }
+    font = ' font-custom';
+    family = `font-family:'pm-${id}', 'Cinzel', serif;`;
+  }
+  const color = /^#[0-9a-f]{6}$/i.test(fps.color ?? '') ? `--np-color:${fps.color};` : '';
+  const style = color || family ? ` style="${color}${family}"` : '';
+  return `<div class="np-fps${font} ${cls}"${style}><span class="np-num">${e(F.fps(fps.value))}</span><span class="np-unit">FPS</span></div>`;
 }
 
 function storagePanel(m) {

@@ -4,10 +4,10 @@ using System.Text.RegularExpressions;
 namespace PcStats.Agent.Games;
 
 /// <param name="LogoUrl">Direct download URL for the logo (PNG/WebP/JPEG) when it is not on Steam.</param>
-/// <param name="FpsFont">Font id for the phone's FPS counter (e.g. "cinzel"); null = default display font.</param>
+/// <param name="FpsFonts">FPS counter font ids in order of preference (first one available wins), e.g. ["hylia-serif","cinzel"].</param>
 /// <param name="FpsColor">FPS counter colour as #RRGGBB; null = default.</param>
 public sealed record GameInfo(string Id, string Name, int? SteamAppId = null, string? BundledLogo = null, string? LogoUrl = null,
-    string? FpsFont = null, string? FpsColor = null);
+    IReadOnlyList<string>? FpsFonts = null, string? FpsColor = null);
 
 /// <summary>Identifies the foreground game from its exe name, Steam install folder, or (for emulators) window title.</summary>
 public sealed class GameCatalog
@@ -56,7 +56,7 @@ public sealed class GameCatalog
                 g.TryGetProperty("steamAppId", out var s) && s.TryGetInt32(out var appId) ? appId : null,
                 g.TryGetProperty("logo", out var l) ? l.GetString() : null,
                 g.TryGetProperty("logoUrl", out var u) && Uri.TryCreate(u.GetString(), UriKind.Absolute, out var uri) && uri.Scheme == Uri.UriSchemeHttps ? uri.ToString() : null,
-                g.TryGetProperty("fpsFont", out var ff) && ff.GetString() is { } font && Regex.IsMatch(font, "^[a-z0-9-]{1,32}$") ? font : null,
+                ReadFonts(g),
                 g.TryGetProperty("fpsColor", out var fc) && fc.GetString() is { } color && Regex.IsMatch(color, "^#[0-9A-Fa-f]{6}$") ? color : null);
             var exes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             if (g.TryGetProperty("exe", out var ex)) foreach (var e in ex.EnumerateArray()) exes.Add(e.GetString() ?? "");
@@ -66,6 +66,16 @@ public sealed class GameCatalog
             _entries.RemoveAll(e => e.Info.Id == id);
             _entries.Add(new Entry(info, exes, title));
         }
+    }
+
+    private static IReadOnlyList<string>? ReadFonts(JsonElement g)
+    {
+        if (!g.TryGetProperty("fpsFont", out var ff)) return null;
+        var ids = ff.ValueKind == JsonValueKind.Array
+            ? ff.EnumerateArray().Select(e => e.GetString()).ToList()
+            : [ff.GetString()];
+        var valid = ids.OfType<string>().Where(Fonts.FontService.IsSafeId).ToList();
+        return valid.Count > 0 ? valid : null;
     }
 
     public GameInfo? Identify(string? exeName, string? exePath, string? windowTitle)

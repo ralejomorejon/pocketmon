@@ -17,6 +17,7 @@ public sealed class Sampler : IDisposable
     private readonly WindowsCpuCounters _cpuCounters;
     private readonly Games.GameCatalog? _games;
     private readonly Games.GameLogoService? _logos;
+    private readonly Fonts.FontService? _fonts;
     private int _diskTick;
     private List<DiskStats> _lastDisks = [];
     private readonly CancellationTokenSource _cts = new();
@@ -27,12 +28,14 @@ public sealed class Sampler : IDisposable
     public string? CpuName { get; private set; }
     public string? GpuName { get; private set; }
 
-    public Sampler(ILogger log, PresentMonRunner? fps, Games.GameCatalog? games = null, Games.GameLogoService? logos = null)
+    public Sampler(ILogger log, PresentMonRunner? fps, Games.GameCatalog? games = null, Games.GameLogoService? logos = null,
+        Fonts.FontService? fonts = null)
     {
         _log = log;
         _fps = fps;
         _games = games;
         _logos = logos;
+        _fonts = fonts;
         _reader = new HardwareSensorReader(log);
         _disks = new DiskReader(log);
         _cpuCounters = new WindowsCpuCounters(log);
@@ -111,7 +114,7 @@ public sealed class Sampler : IDisposable
             {
                 var (path, title) = Infrastructure.NativeMethods.GetForegroundWindowInfo();
                 if (_games.Identify(fps.App, path, title) is { } game)
-                    fps = fps with { Game = game.Name, Logo = _logos?.GetLogoUrl(game), Font = game.FpsFont, Color = game.FpsColor };
+                    fps = fps with { Game = game.Name, Logo = _logos?.GetLogoUrl(game), Font = _fonts?.Resolve(game.FpsFonts), Color = game.FpsColor };
             }
             catch (Exception ex)
             {

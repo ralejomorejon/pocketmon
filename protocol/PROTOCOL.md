@@ -53,7 +53,7 @@ Server → client every `intervalMs`:
 `fps` is `null` when no game/3D app is presenting in the foreground or PresentMon is unavailable.
 When the agent recognises the game, `fps` also has `"game":"Dota 2"` (display name) and, once the logo is available,
 `"logo":"/logos/dota2.png"`. That's a path on the agent's HTTP server (`http://<host>:28555/logos/<id>.png`, PNG with
-transparency). Some games also set `"font"` (FPS counter font id, currently `"cinzel"`) and `"color"` (`#RRGGBB`) so the
+transparency). Some games also set `"font"` (FPS counter font id: built-in `"orbitron"`/`"cinzel"`, or a font installed on the PC that clients load from `/fonts/<id>`) and `"color"` (`#RRGGBB`) so the
 counter matches the game's title lettering; clients ignore font ids they don't know.
 `usage` values are 0–100 percent; temps in °C; `*Bps` in bytes per second.
 `tempLimit` is the CPU throttle temperature (TjMax) when reported; `coreLoads` has one entry per physical core.

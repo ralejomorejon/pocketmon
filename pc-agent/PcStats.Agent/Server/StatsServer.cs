@@ -26,11 +26,12 @@ public sealed class StatsServer : IAsyncDisposable
     private readonly Sampler _sampler;
     private readonly Games.GameCatalog? _games;
     private readonly Games.GameLogoService? _logos;
+    private readonly Fonts.FontService? _fonts;
     private readonly ConcurrentDictionary<Guid, CancellationTokenSource> _clients = new();
     private WebApplication? _app;
 
     public StatsServer(ILoggerFactory loggerFactory, SettingsStore settings, PairingService pairing, Sampler sampler,
-        Games.GameCatalog? games = null, Games.GameLogoService? logos = null)
+        Games.GameCatalog? games = null, Games.GameLogoService? logos = null, Fonts.FontService? fonts = null)
     {
         _loggerFactory = loggerFactory;
         _log = loggerFactory.CreateLogger("Server");
@@ -39,6 +40,7 @@ public sealed class StatsServer : IAsyncDisposable
         _sampler = sampler;
         _games = games;
         _logos = logos;
+        _fonts = fonts;
         _pairing.TokensRevoked += DisconnectAll;
     }
 
@@ -56,6 +58,13 @@ public sealed class StatsServer : IAsyncDisposable
         app.UseWebSockets(new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSeconds(15) });
         UseWebApp(app);
         app.MapGet("/health", () => Results.Text("ok"));
+        app.MapGet("/fonts/{id}", (string id, HttpContext ctx) =>
+        {
+            if (_fonts?.FindFile(id) is not { } path) return Results.NotFound();
+            ctx.Response.Headers.CacheControl = "public, max-age=86400";
+            ctx.Response.Headers.AccessControlAllowOrigin = "*";
+            return Results.File(path, Fonts.FontService.ContentType(path));
+        });
         app.MapGet("/logos/{file}", (string file, HttpContext ctx) =>
         {
             if (_games is null || _logos is null || !file.EndsWith(".png", StringComparison.Ordinal)) return Results.NotFound();

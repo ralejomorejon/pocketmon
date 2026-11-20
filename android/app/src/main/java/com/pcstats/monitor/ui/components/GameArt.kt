@@ -26,6 +26,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontVariation
@@ -74,6 +75,29 @@ fun rememberRemoteImage(url: String?): ImageBitmap? {
     return image
 }
 
+private val FontCache = ConcurrentHashMap<String, FontFamily>()
+
+/** Downloads a font from the agent into the app cache and loads it. Null while loading, on failure or for a null url. */
+@Composable
+fun rememberRemoteFont(url: String?): FontFamily? {
+    val dir = LocalContext.current.cacheDir
+    val family by produceState<FontFamily?>(url?.let { FontCache[it] }, url) {
+        value = url?.let { FontCache[it] }
+        if (url == null || value != null) return@produceState
+        value = withContext(Dispatchers.IO) {
+            runCatching {
+                ImageHttp.newCall(Request.Builder().url(url).build()).execute().use { r ->
+                    if (!r.isSuccessful) return@use null
+                    val file = java.io.File(dir, "font-" + url.substringAfterLast('/'))
+                    file.writeBytes(r.body.bytes())
+                    FontFamily(android.graphics.Typeface.createFromFile(file))
+                }
+            }.getOrNull()
+        }?.also { FontCache[url] = it }
+    }
+    return family
+}
+
 /** Joins the agent root and a logo path from the snapshot; only agent-relative paths are accepted. */
 fun logoUrl(httpBase: String?, logo: String?): String? =
     if (httpBase == null || logo == null || !logo.startsWith("/logos/")) null else httpBase + logo
@@ -94,10 +118,22 @@ fun parseHexColor(hex: String?): Color? =
  * lettering ([font] "cinzel" for Zelda), drawn in a metallic gradient of [color] like the game's logo.
  */
 @Composable
-fun FpsCounter(value: Double?, size: TextUnit, modifier: Modifier = Modifier, font: String? = null, color: String? = null) {
+fun FpsCounter(
+    value: Double?,
+    size: TextUnit,
+    modifier: Modifier = Modifier,
+    font: String? = null,
+    color: String? = null,
+    httpBase: String? = null,
+) {
     val tint = parseHexColor(color)
-    val cinzel = font == "cinzel"
-    val family = if (cinzel) Cinzel else Orbitron
+    // Fonts other than the bundled ones are installed on the PC and served by the agent (licence-restricted fonts
+    // like Hylia Serif are never shipped in the app). Cinzel stands in while one loads.
+    val custom = font?.takeIf { it != "cinzel" && it != "orbitron" && Regex("^[a-z0-9][a-z0-9-]{0,31}$").matches(it) }
+    val customFamily = rememberRemoteFont(custom?.let { id -> httpBase?.let { "$it/fonts/$id" } })
+    val cinzel = font != null && font != "orbitron"
+    val family = customFamily ?: if (cinzel) Cinzel else Orbitron
+    val weight = if (customFamily != null) FontWeight.Normal else FontWeight.Black
     val numberSize = if (cinzel) size * 1.12f else size
     val numberStyle = if (tint != null && cinzel) {
         TextStyle(
@@ -108,9 +144,10 @@ fun FpsCounter(value: Double?, size: TextUnit, modifier: Modifier = Modifier, fo
         TextStyle(color = tint ?: Palette.Value)
     }
     Row(modifier, verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(Format.fps(value), style = numberStyle, fontFamily = family, fontWeight = FontWeight.Black, fontSize = numberSize, maxLines = 1)
+        Text(Format.fps(value), style = numberStyle, fontFamily = family, fontWeight = weight, fontSize = numberSize, maxLines = 1)
         Text(
-            "FPS", color = tint ?: Color(0xFFFF5B3A), fontFamily = family, fontWeight = FontWeight.Bold,
+            "FPS", color = tint ?: Color(0xFFFF5B3A), fontFamily = family,
+            fontWeight = if (customFamily != null) FontWeight.Normal else FontWeight.Bold,
             fontSize = size * (if (cinzel) 0.32f else 0.28f), letterSpacing = (if (cinzel) 3 else 2).sp,
             modifier = Modifier.padding(bottom = (size.value * 0.12f).dp),
         )
@@ -134,12 +171,12 @@ fun NowPlaying(fps: FpsStats, httpBase: String?, modifier: Modifier = Modifier) 
         if (maxHeight < 150.dp && maxWidth > maxHeight * 1.3f) {
             Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 art(Modifier.weight(1.6f).fillMaxHeight())
-                FpsCounter(fps.value, 34.sp, font = fps.font, color = fps.color)
+                FpsCounter(fps.value, 34.sp, font = fps.font, color = fps.color, httpBase = httpBase)
             }
         } else {
             Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                 art(Modifier.fillMaxWidth().weight(1f))
-                FpsCounter(fps.value, 44.sp, font = fps.font, color = fps.color)
+                FpsCounter(fps.value, 44.sp, font = fps.font, color = fps.color, httpBase = httpBase)
             }
         }
     }

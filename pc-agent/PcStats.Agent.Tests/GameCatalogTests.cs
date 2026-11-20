@@ -22,8 +22,28 @@ public class GameCatalogTests
         Assert.Equal("zelda-oot-remake", hookshot?.Id);
         Assert.Equal("The Legend of Zelda: Ocarina of Time", hookshot?.Name);
         Assert.StartsWith("https://", hookshot?.LogoUrl);
-        Assert.Equal(("cinzel", "#E2B04A"), (hookshot?.FpsFont, hookshot?.FpsColor));
-        Assert.Null(Catalog().Identify("dota2.exe", null, null)?.FpsFont);
+        Assert.Equal(["hylia-serif", "cinzel"], hookshot?.FpsFonts);
+        Assert.Equal("#E2B04A", hookshot?.FpsColor);
+        Assert.Null(Catalog().Identify("dota2.exe", null, null)?.FpsFonts);
+    }
+
+    [Fact]
+    public void User_font_wins_when_installed_otherwise_bundled_fallback()
+    {
+        var dir = Directory.CreateTempSubdirectory();
+        try
+        {
+            var fonts = new PcStats.Agent.Fonts.FontService(dir.FullName);
+            Assert.Equal("cinzel", fonts.Resolve(["hylia-serif", "cinzel"]));
+            File.WriteAllBytes(Path.Combine(dir.FullName, "hylia-serif.otf"), [0x4F, 0x54, 0x54, 0x4F]);
+            Assert.Equal("hylia-serif", fonts.Resolve(["hylia-serif", "cinzel"]));
+            Assert.Null(fonts.FindFile("..\\hylia-serif"));
+            Assert.Null(fonts.Resolve(null));
+        }
+        finally
+        {
+            dir.Delete(true);
+        }
     }
 
     [Fact]
