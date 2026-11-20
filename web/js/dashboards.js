@@ -139,13 +139,22 @@ function nowPlaying(fps, row = false) {
   const logo = fps.logo
     ? `<img class="np-logo" src="${e(fps.logo)}" alt="${e(title)}">`
     : `<div class="np-name">${fit(e(title), 20)}</div>`;
-  return `<div class="np${row ? ' row' : ''}">${logo}<div class="np-fps"><span class="np-num">${e(F.fps(fps.value))}</span><span class="np-unit">FPS</span></div></div>`;
+  return `<div class="np${row ? ' row' : ''}">${logo}${fpsCounter(fps)}</div>`;
 }
 
-function storagePanel(m, landscape = true) {
+/** FPS number + label. Per-game style (e.g. Zelda: Cinzel in the logo's gold); the agent sends a font id and #RRGGBB. */
+function fpsCounter(fps, cls = '') {
+  const font = /^[a-z0-9-]+$/.test(fps.font ?? '') ? ` font-${fps.font}` : '';
+  const color = /^#[0-9a-f]{6}$/i.test(fps.color ?? '') ? ` style="--np-color:${fps.color}"` : '';
+  return `<div class="np-fps${font} ${cls}"${color}><span class="np-num">${e(F.fps(fps.value))}</span><span class="np-unit">FPS</span></div>`;
+}
+
+function storagePanel(m) {
   const disks = m.s?.disks ?? [];
   const fps = m.s?.fps;
-  const rows = disks.slice(0, fps ? 2 : 4).map((d) => {
+  // While a game is running this panel belongs to it: the logo gets the whole space; drives return afterwards.
+  if (fps) return `<div class="panel">${header('Now playing')}${nowPlaying(fps)}</div>`;
+  const rows = disks.slice(0, 4).map((d) => {
     const used = isNum(d.freeMb) && isNum(d.totalMb) && d.totalMb > 0 ? 1 - d.freeMb / d.totalMb : null;
     const color = used === null ? C.label : used >= 0.9 ? C.heat : used >= 0.75 ? C.amber : C.cool;
     return `<div class="disk">
@@ -154,7 +163,7 @@ function storagePanel(m, landscape = true) {
         <div class="row">${fit(`${e(F.size(d.freeMb))} free of ${e(F.size(d.totalMb))}`, 9.5, 'muted grow')}${isNum(d.temp) ? `<span class="muted t">${e(m.t(d.temp))}°</span>` : ''}</div></div>
     </div>`;
   });
-  return `<div class="panel">${header('Storage')}<div class="disks">${rows.join('') || `<div class="muted">${F.DASH}</div>`}</div>${fps ? nowPlaying(fps, !landscape) : ''}</div>`;
+  return `<div class="panel">${header('Storage')}<div class="disks">${rows.join('') || `<div class="muted">${F.DASH}</div>`}</div></div>`;
 }
 
 export function modern(m, landscape) {
@@ -163,14 +172,14 @@ export function modern(m, landscape) {
       <div class="col" style="flex:.95"><div class="cell" style="flex:1">${clockPanel(m)}</div><div class="cell bt" style="flex:1.1">${networkPanel(m)}</div></div>
       <div class="cell bl" style="flex:1.45">${cpuPanel(m, false)}</div>
       <div class="cell bl" style="flex:1.45">${gpuPanel(m, false)}</div>
-      <div class="col bl" style="flex:1"><div class="cell" style="flex:.8">${memoryPanel(m)}</div><div class="cell bt" style="flex:1.2">${storagePanel(m)}</div></div>
+      <div class="col bl" style="flex:1"><div class="cell" style="flex:${0.8}">${memoryPanel(m)}</div><div class="cell bt" style="flex:${1.2}">${storagePanel(m)}</div></div>
     </div>`;
   }
   return `<div class="modern col fill">
     <div class="row" style="flex:.85"><div class="cell" style="flex:1">${clockPanel(m)}</div><div class="cell bl" style="flex:1">${memoryPanel(m)}</div></div>
     <div class="cell bt" style="flex:1.3">${cpuPanel(m, true)}</div>
     <div class="cell bt" style="flex:1.3">${gpuPanel(m, true)}</div>
-    <div class="row bt" style="flex:1"><div class="cell" style="flex:1">${networkPanel(m)}</div><div class="cell bl" style="flex:1">${storagePanel(m, false)}</div></div>
+    <div class="row bt" style="flex:1"><div class="cell" style="flex:1">${networkPanel(m)}</div><div class="cell bl" style="flex:1">${storagePanel(m)}</div></div>
   </div>`;
 }
 
@@ -211,7 +220,7 @@ function classicTiles(m) {
     `${tileHeader('FANS')}${(s?.fans ?? []).length ? s.fans.map((x) => metric(x.name ?? 'Fan', F.rpm(x.rpm))).join('') : `<div class="muted">${F.DASH}</div>`}`,
   ];
   if (s?.fps) {
-    tiles.push(`${tileHeader('FPS', s.fps.logo ? null : (s.fps.game ?? s.fps.app))}${s.fps.logo ? `<img class="fps-logo" src="${e(s.fps.logo)}" alt="${e(s.fps.game ?? '')}">` : ''}<div class="fpsbig">${e(F.fps(s.fps.value))}</div><div class="sp">${sparkline(m.stats.fpsSeries, C.accent + 'B3')}</div>`);
+    tiles.push(`${tileHeader('FPS', s.fps.logo ? null : (s.fps.game ?? s.fps.app))}${s.fps.logo ? `<img class="fps-logo" src="${e(s.fps.logo)}" alt="${e(s.fps.game ?? '')}">` : ''}${fpsCounter(s.fps)}<div class="sp">${sparkline(m.stats.fpsSeries, C.accent + 'B3')}</div>`);
   }
   return tiles;
 }

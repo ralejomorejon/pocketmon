@@ -5,8 +5,8 @@
     "Dolphin.exe", "Cemu.exe", "Ryujinx.exe", "yuzu.exe", "suyu.exe", "citra-qt.exe", "azahar.exe", "lime3ds-gui.exe"
   ],
   "games": [
-    { "id": "zelda-oot", "name": "The Legend of Zelda: Ocarina of Time", "exe": ["soh.exe"], "title": "(?i)ocarina of time|\\bthe legend of zelda\\b(?!.*majora)", "logo": "zelda-oot.png" },
-    { "id": "zelda-oot-remake", "name": "The Legend of Zelda: Ocarina of Time", "exe": ["hookshot.exe"], "logoUrl": "https://www.zeldaxtreme.com/img/press/ootr/logo-1200.webp" },
+    { "id": "zelda-oot", "name": "The Legend of Zelda: Ocarina of Time", "exe": ["soh.exe"], "title": "(?i)ocarina of time|\\bthe legend of zelda\\b(?!.*majora)", "logo": "zelda-oot.png", "fpsFont": "cinzel", "fpsColor": "#E01A18" },
+    { "id": "zelda-oot-remake", "name": "The Legend of Zelda: Ocarina of Time", "exe": ["hookshot.exe"], "logoUrl": "https://www.zeldaxtreme.com/img/press/ootr/logo-1200.webp", "fpsFont": "cinzel", "fpsColor": "#E2B04A" },
     { "id": "dota2", "name": "Dota 2", "exe": ["dota2.exe"], "steamAppId": 570 },
     { "id": "cs2", "name": "Counter-Strike 2", "exe": ["cs2.exe"], "steamAppId": 730 },
     { "id": "cyberpunk2077", "name": "Cyberpunk 2077", "exe": ["Cyberpunk2077.exe"], "steamAppId": 1091500 },

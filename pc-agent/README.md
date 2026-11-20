@@ -73,7 +73,8 @@ When PresentMon reports FPS for the foreground app, the agent identifies the gam
 snapshot (the phone shows them next to the FPS counter). It identifies games in this order:
 
 1. **`games.json`**: exe name, e.g. `dota2.exe` → Dota 2, `hookshot.exe` → Ocarina of Time (Switch 2 remake logo). Ships
-   with ~20 popular games. An entry can name a `logoUrl` (https PNG/WebP/JPEG) for games not on Steam.
+   with ~20 popular games. An entry can name a `logoUrl` (https PNG/WebP/JPEG) for games not on Steam, and `fpsFont`/`fpsColor` to style the
+   phone's FPS counter like the game's title (the Zelda entries use `cinzel` in the logo's red/gold).
 2. **Any Steam game**: the exe's `...\steamapps\common\<folder>` is matched to that library's `appmanifest_*.acf`.
 3. **Emulators**: for the emulators listed in `games.json` (Project64, RetroArch, Dolphin…), the window title is
    matched against each game's `title` regex. For example, Ocarina of Time in Project64 or Ship of Harkinian (`soh.exe`).

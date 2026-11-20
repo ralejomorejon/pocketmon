@@ -261,6 +261,6 @@ private fun ColumnScope.FpsTile(s: Snapshot?, series: SampleSeries, httpBase: St
         Image(logo, contentDescription = f.game, contentScale = ContentScale.Fit, alignment = Alignment.CenterStart,
             modifier = Modifier.fillMaxWidth().height(44.dp))
     }
-    FpsCounter(f.value, 44.sp)
+    FpsCounter(f.value, 44.sp, font = f.font, color = f.color)
     SparkArea(series)
 }

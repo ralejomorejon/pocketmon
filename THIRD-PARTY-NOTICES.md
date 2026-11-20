@@ -10,6 +10,7 @@ PocketMon uses or bundles the following open-source components.
 | ASP.NET Core / .NET runtime | PC agent | MIT |
 | [NoSleep.js](https://github.com/richtr/NoSleep.js) (bundled in `web/vendor/`) | Web app — keep screen on | MIT, © Rich Tibbett — see `web/vendor/NoSleep.LICENSE` |
 | [Orbitron](https://github.com/theleagueof/orbitron) font (`web/fonts/`, Android `res/font/`) | FPS counter | SIL Open Font License 1.1 — see `web/fonts/Orbitron-OFL.txt` |
+| [Cinzel](https://github.com/NDISCOVER/Cinzel) font (`web/fonts/`, Android `res/font/`) | FPS counter for Zelda games | SIL Open Font License 1.1 — see `web/fonts/Cinzel-OFL.txt` |
 | AndroidX, Jetpack Compose | Android app | Apache-2.0 |
 | [OkHttp](https://github.com/square/okhttp) | Android app | Apache-2.0 |
 | kotlinx.serialization, kotlinx.coroutines | Android app | Apache-2.0 |

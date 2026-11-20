@@ -99,7 +99,9 @@ public sealed record FanStats(string Name, long Rpm);
 
 /// <param name="Game">Display name when the foreground app is a known game.</param>
 /// <param name="Logo">Agent-relative URL of the game's logo (e.g. "/logos/dota2.png") once available.</param>
-public sealed record FpsStats(string App, double? Value, string? Game = null, string? Logo = null);
+/// <param name="Font">Font id for the FPS counter matching the game's title lettering (e.g. "cinzel").</param>
+/// <param name="Color">FPS counter colour (#RRGGBB) matching the game's logo.</param>
+public sealed record FpsStats(string App, double? Value, string? Game = null, string? Logo = null, string? Font = null, string? Color = null);
 
 public sealed class WelcomeMessage
 {

@@ -111,7 +111,7 @@ public sealed class Sampler : IDisposable
             {
                 var (path, title) = Infrastructure.NativeMethods.GetForegroundWindowInfo();
                 if (_games.Identify(fps.App, path, title) is { } game)
-                    fps = fps with { Game = game.Name, Logo = _logos?.GetLogoUrl(game) };
+                    fps = fps with { Game = game.Name, Logo = _logos?.GetLogoUrl(game), Font = game.FpsFont, Color = game.FpsColor };
             }
             catch (Exception ex)
             {

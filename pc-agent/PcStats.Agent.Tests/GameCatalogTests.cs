@@ -22,6 +22,8 @@ public class GameCatalogTests
         Assert.Equal("zelda-oot-remake", hookshot?.Id);
         Assert.Equal("The Legend of Zelda: Ocarina of Time", hookshot?.Name);
         Assert.StartsWith("https://", hookshot?.LogoUrl);
+        Assert.Equal(("cinzel", "#E2B04A"), (hookshot?.FpsFont, hookshot?.FpsColor));
+        Assert.Null(Catalog().Identify("dota2.exe", null, null)?.FpsFont);
     }
 
     [Fact]

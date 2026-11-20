@@ -526,25 +526,23 @@ private fun ColumnScope.MemoryPanel(m: DashModel) {
 
 @Composable
 private fun ColumnScope.StoragePanel(m: DashModel) {
-    PanelHeader("Storage", live = true)
     val fps = m.s?.fps
+    if (fps != null) {
+        // While a game is running this panel belongs to it: the logo gets the whole space; drives return afterwards.
+        PanelHeader("Now playing", live = true)
+        NowPlaying(fps, m.httpBase, Modifier.fillMaxWidth().weight(1f).padding(top = 4.dp))
+        return
+    }
+    PanelHeader("Storage", live = true)
     Spacer(Modifier.height(8.dp))
     val disks = m.s?.disks.orEmpty()
     if (disks.isEmpty()) {
         Text(DASH, color = Palette.Label, fontSize = 14.sp)
     } else {
-        Column(
-            if (fps == null) Modifier.fillMaxWidth().weight(1f) else Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            // Show as many drives as fit comfortably (rows are ~44 dp); fewer while a game is shown below.
-            disks.take(if (fps == null) 4 else 2).forEach { d -> DiskRow(m, d, Modifier) }
+        Column(Modifier.fillMaxWidth().weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            // Show as many drives as fit comfortably (rows are ~44 dp).
+            disks.take(4).forEach { d -> DiskRow(m, d, Modifier) }
         }
-    }
-    if (fps != null) {
-        Spacer(Modifier.height(8.dp))
-        Box(Modifier.fillMaxWidth().height(1.dp).background(Palette.Divider))
-        NowPlaying(fps, m.httpBase, Modifier.fillMaxWidth().weight(1f).padding(top = 8.dp))
     }
 }
 

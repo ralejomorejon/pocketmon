@@ -4,7 +4,10 @@ using System.Text.RegularExpressions;
 namespace PcStats.Agent.Games;
 
 /// <param name="LogoUrl">Direct download URL for the logo (PNG/WebP/JPEG) when it is not on Steam.</param>
-public sealed record GameInfo(string Id, string Name, int? SteamAppId = null, string? BundledLogo = null, string? LogoUrl = null);
+/// <param name="FpsFont">Font id for the phone's FPS counter (e.g. "cinzel"); null = default display font.</param>
+/// <param name="FpsColor">FPS counter colour as #RRGGBB; null = default.</param>
+public sealed record GameInfo(string Id, string Name, int? SteamAppId = null, string? BundledLogo = null, string? LogoUrl = null,
+    string? FpsFont = null, string? FpsColor = null);
 
 /// <summary>Identifies the foreground game from its exe name, Steam install folder, or (for emulators) window title.</summary>
 public sealed class GameCatalog
@@ -52,7 +55,9 @@ public sealed class GameCatalog
                 g.TryGetProperty("name", out var n) ? n.GetString() ?? id : id,
                 g.TryGetProperty("steamAppId", out var s) && s.TryGetInt32(out var appId) ? appId : null,
                 g.TryGetProperty("logo", out var l) ? l.GetString() : null,
-                g.TryGetProperty("logoUrl", out var u) && Uri.TryCreate(u.GetString(), UriKind.Absolute, out var uri) && uri.Scheme == Uri.UriSchemeHttps ? uri.ToString() : null);
+                g.TryGetProperty("logoUrl", out var u) && Uri.TryCreate(u.GetString(), UriKind.Absolute, out var uri) && uri.Scheme == Uri.UriSchemeHttps ? uri.ToString() : null,
+                g.TryGetProperty("fpsFont", out var ff) && ff.GetString() is { } font && Regex.IsMatch(font, "^[a-z0-9-]{1,32}$") ? font : null,
+                g.TryGetProperty("fpsColor", out var fc) && fc.GetString() is { } color && Regex.IsMatch(color, "^#[0-9A-Fa-f]{6}$") ? color : null);
             var exes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             if (g.TryGetProperty("exe", out var ex)) foreach (var e in ex.EnumerateArray()) exes.Add(e.GetString() ?? "");
             var title = g.TryGetProperty("title", out var t) && t.GetString() is { Length: > 0 } pattern

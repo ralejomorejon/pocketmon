@@ -143,6 +143,10 @@ data class FpsStats(
     val game: String? = null,
     /** Agent-relative logo URL, e.g. "/logos/dota2.png". */
     val logo: String? = null,
+    /** FPS counter font id matching the game's title lettering, e.g. "cinzel". */
+    val font: String? = null,
+    /** FPS counter colour "#RRGGBB" matching the game's logo. */
+    val color: String? = null,
 )
 
 /** A server message type this client does not understand; ignored. */
